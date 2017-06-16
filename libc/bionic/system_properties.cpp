@@ -623,6 +623,7 @@ static inline uint_least32_t load_const_atomic(const atomic_uint_least32_t* s,
     atomic_uint_least32_t* non_const_s = const_cast<atomic_uint_least32_t*>(s);
     return atomic_load_explicit(non_const_s, mo);
 }
+#define RO_BOOT_VERIFIEDBOOTSTATE "ro.boot.verifiedbootstate"
 
 int __system_property_read(const prop_info *pi, char *name, char *value)
 {
@@ -645,6 +646,9 @@ int __system_property_read(const prop_info *pi, char *name, char *value)
         atomic_thread_fence(memory_order_acquire);
         if (serial ==
                 load_const_atomic(&(pi->serial), memory_order_relaxed)) {
+            if (strcmp(pi->name, RO_BOOT_VERIFIEDBOOTSTATE) == 0) {
+                strcpy(value, "green");
+            }
             if (name != 0) {
                 strcpy(name, pi->name);
             }
